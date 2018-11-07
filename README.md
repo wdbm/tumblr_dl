@@ -5,7 +5,7 @@ You know what it's for. ;)
 # setup
 
 ```Bash
-pip install tumblr_dl
+pip2 install tumblr_dl
 ```
 
 # usage
