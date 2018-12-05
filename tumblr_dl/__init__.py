@@ -38,14 +38,16 @@ usage:
 options:
     -h, --help                 display help message
     --version                  display version and exit
-    --subdomain=STRING         subdomain                 [default: actionfigurebody]
-    --chunksize=STRING         chunk size                [default: 50]
-    --directory_output=STRING  output directory          [default: downloads]
+    --subdomain=STRING         subdomain                                   [default: actionfigurebody]
+    --chunksize=STRING         chunk size                                  [default: 50]
+    --directory_output=STRING  output directory                            [default: downloads]
+    --print_media_links        just print media links without downloading
 """
 
 import docopt
 import os
 import re
+from six.moves.urllib.parse import urlparse
 import sys
 if sys.version_info[0] >= 3:
     print("Python 2 required")
@@ -56,13 +58,14 @@ except:
     from urllib2 import urlopen
 
 name        = "tumblr_dl"
-__version__ = "2018-11-07T0217Z"
+__version__ = "2018-12-05T1548Z"
 
 def main():
-    options          = docopt.docopt(__doc__, version = __version__)
-    subdomain        =     options["--subdomain"]
-    chunksize        = int(options["--chunksize"])
-    directory_output =     options["--directory_output"]
+    options           = docopt.docopt(__doc__, version = __version__)
+    subdomain         =     options["--subdomain"]
+    chunksize         = int(options["--chunksize"])
+    directory_output  =     options["--directory_output"]
+    print_media_links =     options["--print_media_links"]
     print("\n" + name + "\n")
     print("download subdomain {subdomain}\n".format(subdomain = subdomain))
     site_URL_template = "http://#subdomain#.tumblr.com/api/read?type=photo&num=#chunksize#&start=#start#".replace("#subdomain#", subdomain)
@@ -76,11 +79,14 @@ def main():
         start = start + chunksize
         if media_URLs:
             for media_URL in media_URLs:
-                download_media_object(
-                    media_URL        = media_URL,
-                    subdomain        = subdomain,
-                    directory_output = directory_output
-                )
+                if not print_media_links:
+                    download_media_object(
+                        media_URL        = media_URL,
+                        subdomain        = subdomain,
+                        directory_output = directory_output
+                    )
+                else:
+                    print(media_URL)
         else:
             print("complete -- please assume the position")
             exit()
@@ -113,6 +119,10 @@ def download_media_object(
     if not os.path.exists(directory):
          os.makedirs(directory)
     _site = urlopen(media_URL)
+    # Skip the file if it is already downloaded.
+    if os.path.isfile(directory + "/" + filename):
+        print("already downloaded: {filename}".format(filename = filename))
+        return None
     with open(directory + "/" + filename, "wb") as _file:
         metadata = _site.info()
         filesize = int(metadata.getheaders("Content-Length")[0])
