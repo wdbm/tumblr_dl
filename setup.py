@@ -7,7 +7,7 @@ import setuptools
 def main():
     setuptools.setup(
         name             = "tumblr_dl",
-        version          = "2018.12.05.1548",
+        version          = "2018.12.10.1200",
         description      = "download media of Tumblr subdomains",
         long_description = long_description(),
         url              = "https://github.com/wdbm/tumblr_dl",

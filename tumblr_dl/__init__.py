@@ -52,13 +52,14 @@ import sys
 if sys.version_info[0] >= 3:
     print("Python 2 required")
     sys.exit(1)
+import time
 try:
     from urllib.request import urlopen
 except:
     from urllib2 import urlopen
 
 name        = "tumblr_dl"
-__version__ = "2018-12-05T1548Z"
+__version__ = "2018-12-10T1200Z"
 
 def main():
     options           = docopt.docopt(__doc__, version = __version__)
@@ -122,6 +123,7 @@ def download_media_object(
     # Skip the file if it is already downloaded.
     if os.path.isfile(directory + "/" + filename):
         print("already downloaded: {filename}".format(filename = filename))
+        time.sleep(0.2)
         return None
     with open(directory + "/" + filename, "wb") as _file:
         metadata = _site.info()
